@@ -1,0 +1,16 @@
+{
+  "name": "CascoB · Estrategias ABP",
+  "short_name": "ABP CascoB",
+  "description": "Videoteca de acciones a balón parado del CascoB",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E2E7E",
+  "theme_color": "#1749C4",
+  "lang": "es",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
