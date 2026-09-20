@@ -210,19 +210,21 @@
     var html = topbar(true);
     html += '<div class="player-wrap">';
     if (it.id) {
+      var src = 'https://drive.usercontent.google.com/download?id=' +
+        encodeURIComponent(it.id) + '&export=download&confirm=t';
+      var view = 'https://drive.google.com/file/d/' + encodeURIComponent(it.id) + '/view';
       html +=
-        '<iframe class="player-frame" src="https://drive.google.com/file/d/' +
-        encodeURIComponent(it.id) +
-        '/preview" allow="autoplay" allowfullscreen></iframe>';
+        '<video class="player-frame" controls playsinline preload="metadata" ' +
+        'poster="' + thumb(it.id) + '" src="' + src + '"></video>';
+      html +=
+        '<p class="player-note">Si el vídeo no se ve, ábrelo directamente: ' +
+        '<a class="link" href="' + view + '" target="_blank" rel="noopener">abrir en Google Drive</a>. ' +
+        'Comprueba que la carpeta está compartida para "Cualquier persona con el enlace".</p>';
     } else {
       html +=
         '<div class="player-frame" style="display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:0.9rem;padding:16px;text-align:center">Vista previa con datos de ejemplo.<br>Conecta tu catálogo para reproducir vídeos reales.</div>';
     }
     html += '</div>';
-    if (it.id) {
-      html +=
-        '<p class="player-note">Si el vídeo no se carga, asegúrate de que la carpeta de Drive está compartida para "Cualquier persona con el enlace" y vuelve a intentarlo.</p>';
-    }
     html += '<div class="chip">' + esc(it.cat.label) + '</div>';
     html += '<div class="doc-title">' + esc(it.name) + '</div>';
     app.innerHTML = html;
