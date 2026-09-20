@@ -13,7 +13,7 @@ window.APP_CONFIG = {
     logo: "Escudo.png"
   },
   data: {
-    sheetUrl: "https://script.google.com/macros/s/AKfycbyRJgSU7yzj6yIJYQOXTz4LGvR8SwC5p6Y6r2Ap0cYxWffKZLaKweJfFSyJOpGcJYXPVg/exec",
+    sheetUrl: "https://script.google.com/macros/s/AKfycbzTVlQPSKacv835CwVHkBeXWJoPKT6VXwLHbeI4WDLOQgwqUOoE_8hfEnej2PCj9g_l8A/exec",
     useSample: false
   },
   sample: {

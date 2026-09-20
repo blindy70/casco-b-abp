@@ -1,4 +1,4 @@
-var CACHE = 'casco-abp-v8';
+var CACHE = 'casco-abp-v9';
 var SHELL = [
   './',
   'index.html',
