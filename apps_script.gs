@@ -95,3 +95,8 @@ function out(payload) {
     .createTextOutput(JSON.stringify(payload))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+function probar() {
+  UrlFetchApp.fetch('https://www.google.com');
+  return 'Sí se pudo: permisos concedidos';
+}
