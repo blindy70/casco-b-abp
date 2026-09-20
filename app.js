@@ -210,14 +210,14 @@
     var html = topbar(true);
     html += '<div class="player-wrap">';
     if (it.id) {
-      var src = 'https://drive.usercontent.google.com/download?id=' +
-        encodeURIComponent(it.id) + '&export=download&confirm=t';
       var view = 'https://drive.google.com/file/d/' + encodeURIComponent(it.id) + '/view';
       html +=
-        '<video class="player-frame" controls playsinline preload="metadata" ' +
-        'poster="' + thumb(it.id) + '" src="' + src + '"></video>';
+        '<video class="player-frame" id="pv" controls playsinline preload="none" ' +
+        'poster="' + thumb(it.id) + '"></video>';
       html +=
-        '<p class="player-note">Si el vídeo no se ve, ábrelo directamente: ' +
+        '<div class="player-lay" id="player-lay"><span class="spin" aria-hidden="true"></span>Cargando vídeo…</div>';
+      html +=
+        '<p class="player-note">Si el vídeo no se carga, ábrelo directamente: ' +
         '<a class="link" href="' + view + '" target="_blank" rel="noopener">abrir en Google Drive</a>. ' +
         'Comprueba que la carpeta está compartida para "Cualquier persona con el enlace".</p>';
     } else {
@@ -228,7 +228,30 @@
     html += '<div class="chip">' + esc(it.cat.label) + '</div>';
     html += '<div class="doc-title">' + esc(it.name) + '</div>';
     app.innerHTML = html;
+    if (it.id) loadVideo(it.id);
     attachBack();
+  }
+
+  function loadVideo(id) {
+    var v = document.getElementById('pv');
+    var lay = document.getElementById('player-lay');
+    var url = 'https://drive.usercontent.google.com/download?id=' +
+      encodeURIComponent(id) + '&export=download&confirm=t';
+    fetch(url)
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.blob();
+      })
+      .then(function (blob) {
+        v.src = URL.createObjectURL(blob);
+        v.addEventListener('canplay', function () {
+          if (lay) lay.style.display = 'none';
+        });
+      })
+      .catch(function () {
+        v.controls = false;
+        if (lay) lay.innerHTML = 'No se pudo cargar el vídeo.<br>Ábrelo con el enlace "abrir en Google Drive" de abajo.';
+      });
   }
 
   function attachBack() {
