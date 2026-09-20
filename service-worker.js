@@ -1,4 +1,4 @@
-var CACHE = 'casco-abp-v5';
+var CACHE = 'casco-abp-v6';
 var SHELL = [
   './',
   'index.html',
@@ -38,19 +38,8 @@ self.addEventListener('fetch', function (e) {
     }
     return;
   }
-  e.respondWith(cacheFirst(e.request));
+  e.respondWith(networkFirst(e.request));
 });
-
-function cacheFirst(req) {
-  return caches.match(req).then(function (hit) {
-    if (hit) return hit;
-    return fetch(req).then(function (res) {
-      var copy = res.clone();
-      caches.open(CACHE).then(function (c) { c.put(req, copy); });
-      return res;
-    });
-  });
-}
 
 function networkFirst(req) {
   return fetch(req)
