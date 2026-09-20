@@ -1,6 +1,15 @@
 var SHEET_NAME = 'Videos';
+var MAX_BYTES = 25 * 1024 * 1024;
+var VIDEO_URL = 'https://drive.usercontent.google.com/download?id=%s&export=download&confirm=t';
 
-function doGet() {
+function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'video') {
+    return serveVideo(e.parameter.id);
+  }
+  return serveCatalog();
+}
+
+function serveCatalog() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
@@ -32,6 +41,38 @@ function doGet() {
   }
   items.sort(function (a, b) { return a.order - b.order; });
   return out({ items: items });
+}
+
+function serveVideo(id) {
+  id = String(id || '').trim();
+  if (!/^[\w-]{25,}$/.test(id)) {
+    return out({ error: 'ID de vídeo no válido' });
+  }
+  try {
+    var res = UrlFetchApp.fetch(VIDEO_URL.replace('%s', encodeURIComponent(id)), { muteHttpExceptions: true });
+    if (res.getResponseCode() !== 200) {
+      throw new Error('Fallo al descargar el vídeo (HTTP ' + res.getResponseCode() + ')');
+    }
+    var ct = res.getBlob().getContentType() || '';
+    if (ct.indexOf('text/') === 0) {
+      throw new Error('Drive no devolvió un vídeo para este enlace');
+    }
+    var bytes = res.getContent();
+    if (!bytes.length) {
+      throw new Error('Vídeo vacío');
+    }
+    if (bytes.length > MAX_BYTES) {
+      throw new Error('Vídeo demasiado grande (máx. ~25 MB). Acorta el clip en Drive.');
+    }
+    return out({
+      name: res.getBlob().getName() || 'video.mp4',
+      mime: ct || 'video/mp4',
+      size: bytes.length,
+      data: Utilities.base64Encode(bytes)
+    });
+  } catch (err) {
+    return out({ error: err.message || 'No se pudo cargar el vídeo' });
+  }
 }
 
 function extractId(link) {

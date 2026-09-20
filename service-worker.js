@@ -1,4 +1,4 @@
-var CACHE = 'casco-abp-v7';
+var CACHE = 'casco-abp-v8';
 var SHELL = [
   './',
   'index.html',
@@ -34,7 +34,11 @@ self.addEventListener('fetch', function (e) {
   var url = new URL(e.request.url);
   if (url.origin !== location.origin) {
     if (url.hostname.indexOf('google.com') !== -1 && url.pathname.indexOf('/macros/') !== -1) {
-      e.respondWith(networkFirst(e.request));
+      if (url.searchParams.get('action') === 'video') {
+        e.respondWith(fetch(e.request));
+      } else {
+        e.respondWith(networkFirst(e.request));
+      }
     }
     return;
   }

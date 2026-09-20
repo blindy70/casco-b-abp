@@ -235,22 +235,30 @@
   function loadVideo(id) {
     var v = document.getElementById('pv');
     var lay = document.getElementById('player-lay');
-    var url = 'https://drive.usercontent.google.com/download?id=' +
-      encodeURIComponent(id) + '&export=download&confirm=t';
-    fetch(url)
+    function fail(msg) {
+      v.controls = false;
+      if (lay) lay.innerHTML = (msg ? msg + '<br>' : '') + 'Ábrelo con el enlace "abrir en Google Drive" de abajo.';
+    }
+    var base = String(C.data.sheetUrl || '').replace(/\/exec$/, '');
+    if (!base) return fail('No se pudo cargar el vídeo.');
+    fetch(base + '/exec?action=video&id=' + encodeURIComponent(id), { cache: 'no-store' })
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.blob();
+        return r.json();
       })
-      .then(function (blob) {
-        v.src = URL.createObjectURL(blob);
+      .then(function (j) {
+        if (j.error) throw new Error(j.error);
+        if (!j.data) throw new Error('Respuesta vacía');
+        var bin = atob(j.data);
+        var bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        v.src = URL.createObjectURL(new Blob([bytes], { type: j.mime || 'video/mp4' }));
         v.addEventListener('canplay', function () {
           if (lay) lay.style.display = 'none';
         });
       })
       .catch(function () {
-        v.controls = false;
-        if (lay) lay.innerHTML = 'No se pudo cargar el vídeo.<br>Ábrelo con el enlace "abrir en Google Drive" de abajo.';
+        fail('No se pudo cargar el vídeo.');
       });
   }
 

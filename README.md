@@ -7,12 +7,12 @@ Aplicación web (PWA) para que los jugadores consulten los vídeos de acciones a
 ```
 Jugadores (móvil) ──> GitHub Pages (app estática)
                         └─ catálogo (JSON) <── Google Sheets + Apps Script
-                        └─ vídeos <── Google Drive (embed)
+                        └─ vídeos <── Apps Script (proxy) <── Google Drive
 ```
 
 - El **catálogo** (qué jugadas se ven, sus nombres y enlaces) vive en una **hoja de cálculo de Google**.
 - La app lee esa hoja mediante un pequeño **Apps Script** que la publica como JSON.
-- Los **vídeos** se reproducen desde Google Drive sin descargarlos.
+- Los **vídeos** llegan a través del mismo Apps Script: Google los descarga de tu Drive y la app los muestra en su propio reproductor. Así funcionan en cualquier móvil **sin cuenta de Google**.
 
 ## Pasos de instalación (una sola vez)
 
@@ -50,7 +50,7 @@ Para el desplegable de Categoría: selecciona la columna C → *Datos* → *Vali
 1. En la hoja: menú **Extensiones** → **Apps Script**.
 2. Borra el contenido del editor y pega el contenido de **`apps_script.gs`** (este proyecto).
 3. Guarda (icono 💾) con el nombre que quieras.
-4. Ejecuta la función **`doGet`** una vez y **autoriza** (permite editar tu hoja y publicar). En la lista de funciones elige *doGet* → *Ejecutar* → acepta los permisos.
+4. Ejecuta la función **`doGet`** una vez y **autoriza** (permite editar tu hoja, publicar y acceder a servicios externos para descargar los vídeos). En la lista de funciones elige *doGet* → *Ejecutar* → acepta los permisos.
 5. Arriba a la derecha: **Implementar / Deploy** → **Nueva implementación** → tipo **Aplicación web**:
    - Ejecutar como: *Yo*.
    - Acceso: **Cualquier persona**.
@@ -58,6 +58,10 @@ Para el desplegable de Categoría: selecciona la columna C → *Datos* → *Vali
 7. Abre `config.js` y pega esa URL en `data.sheetUrl`. Deja `useSample: false` para ver los vídeos reales.
 
 Prueba la URL en el navegador: debe devolver un JSON que empieza por `{"items":[...]}`.
+
+> **Cuando actualices este archivo en el futuro** (texto «apps_script.gs»): pega el contenido nuevo sustituyendo al viejo, guarda, y en *Implementar / Deploy* → **Administrar implementaciones** → ✏️ editar a la derecha de *Aplicación web* → versión **Nueva versión** → *Implementar*. **La URL no cambia**; no toques `config.js`. Puede que Google pida autorizar otra vez; acepta.
+
+> **Tamaño de los vídeos**: el clip se descarga completo antes de reproducirse. Los jugadores de **hasta ~25 MB** se ven al instante; si uno pesa más, recorta el clip (p. ej. con una app de edición) antes de subirlo a Drive.
 
 ### 4. Publicar la app en GitHub Pages
 
@@ -89,5 +93,6 @@ Escudo.png           → escudo del club
 ## Notas
 
 - La interfaz funciona sin conexión (se guarda en caché); **el vídeo necesita Internet** para cargarse desde Drive.
-- Si un vídeo no se reproduce, confirma que su carpeta está compartida "Cualquier persona con el enlace".
+- Si un vídeo no se reproduce, confirma que su carpeta está compartida "Cualquier persona con el enlace" y que el clip pesa menos de ~25 MB.
+- Si un vídeo sigue sin cargar, debajo del reproductor está el enlace "abrir en Google Drive", que funciona siempre.
 - Solo necesita cuenta de GitHub quien publica. Los jugadores solo abren el enlace.
